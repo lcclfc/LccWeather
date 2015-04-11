@@ -18,6 +18,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lccweather.app.R;
 import com.lccweather.app.db.WeatherDB;
@@ -50,13 +51,16 @@ public class ChooseAreaActivity extends Activity{
 	private City selectedCity;
 	private int currentLevel;
 	
+	private boolean isFromWeatherActivity;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		SharedPreferences prefs = 
 				PreferenceManager.getDefaultSharedPreferences(this);
-		System.out.println(prefs.getBoolean("selected_city", false));
-		if(prefs.getBoolean("selected_city", false)){
+		isFromWeatherActivity = 
+				getIntent().getBooleanExtra("from_weather_activity", false);
+		if(prefs.getBoolean("selected_city", false) && !isFromWeatherActivity){
 			Intent intent = new Intent(this,WeatherActivity.class);
 			startActivity(intent);
 			finish();
@@ -204,6 +208,13 @@ public class ChooseAreaActivity extends Activity{
 			@Override
 			public void onError(Exception e) {
 				Log.d("myTag", "出现异常");
+				closeProgressDialog();
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(ChooseAreaActivity.this, "获取数据异常", Toast.LENGTH_LONG).show();
+					}
+				});
 				e.printStackTrace();
 			}
 		});
@@ -237,6 +248,10 @@ public class ChooseAreaActivity extends Activity{
 		}else if(currentLevel == LEVEL_CITY){
 			queryProvinces();
 		}else{
+			if(isFromWeatherActivity){
+				Intent intent = new Intent(this,WeatherActivity.class);
+				startActivity(intent);
+			}
 			finish();
 		}
 	}
