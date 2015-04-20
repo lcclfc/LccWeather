@@ -1,5 +1,6 @@
 package com.lccweather.app.service;
 
+import com.lccweather.app.MyApplication;
 import com.lccweather.app.receiver.AutoUpdateReceiver;
 import com.lccweather.app.util.HttpCallbackListener;
 import com.lccweather.app.util.HttpUtil;
@@ -15,6 +16,16 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
 public class AutoUpateService extends Service{
+
+	private MyApplication myApplication;
+	
+	
+	
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		myApplication = (MyApplication)getApplication();
+	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -60,7 +71,7 @@ public class AutoUpateService extends Service{
 			
 			@Override
 			public void onFinish(String response) {
-				Utility.handleWeatherReponse(AutoUpateService.this, response);
+				//Utility.handleWeatherReponse(AutoUpateService.this, response,myApplication);
 			}
 			
 			@Override

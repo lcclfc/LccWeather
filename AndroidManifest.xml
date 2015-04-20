@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
+        android:name="com.lccweather.app.MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/lc"
         android:label="@string/app_name"

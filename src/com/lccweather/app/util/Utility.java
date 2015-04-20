@@ -7,11 +7,13 @@ import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
+import com.lccweather.app.MyApplication;
 import com.lccweather.app.db.WeatherDB;
 import com.lccweather.app.model.City;
 import com.lccweather.app.model.County;
@@ -102,7 +104,7 @@ public class Utility {
 	 * @param context
 	 * @param response
 	 */
-	public static void handleWeatherReponse(Context context,String response){
+	public static void handleWeatherReponse(Context context,String response,MyApplication application,String selectedPrefs){
 		try {
 			JSONObject jsonObject = new JSONObject(response);
 			JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
@@ -112,9 +114,15 @@ public class Utility {
 			String temp2 = weatherInfo.getString("temp2");
 			String weatherDesc = weatherInfo.getString("weather");
 			String publishTime = weatherInfo.getString("ptime");
-
-			saveWeatherInfo(context, cityName, weatherCode, temp1, temp2, 
-					weatherDesc, publishTime);
+            
+			String fileName = null;
+			if(selectedPrefs == null || selectedPrefs == ""){
+				fileName = "defaultPrefs";
+			}else{
+				fileName = selectedPrefs;
+			}
+			saveWeatherInfo(context, fileName,cityName, weatherCode, temp1, temp2, 
+					weatherDesc, publishTime,application);
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -131,11 +139,18 @@ public class Utility {
 	 * @param weatherDesc
 	 * @param publishTime
 	 */
-	private static void saveWeatherInfo(Context context,String cityName,
+	private static void saveWeatherInfo(Context context,String fileName,String cityName,
 			String weatherCode,String temp1,String temp2,
-			String weatherDesc,String publishTime){
-		SharedPreferences.Editor editor = 
-				PreferenceManager.getDefaultSharedPreferences(context).edit();
+			String weatherDesc,String publishTime,MyApplication application){
+		SharedPreferences sharePreferences = null;
+		if("defaultPrefs".equals(fileName)){
+			sharePreferences = 
+					PreferenceManager.getDefaultSharedPreferences(context);
+		}else{
+			sharePreferences = 
+					context.getSharedPreferences(fileName, context.MODE_PRIVATE);
+		}
+		SharedPreferences.Editor editor = sharePreferences.edit();
 		SimpleDateFormat simpleformat = 
 				new SimpleDateFormat("yyyyƒÍMM‘¬dd»’",Locale.CHINA);
 		editor.putBoolean("selected_city", true);
